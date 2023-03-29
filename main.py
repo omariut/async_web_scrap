@@ -33,17 +33,17 @@ async def main():
     #SOUPS = [soup,soup,soup,soup]
 
 
-    # #collect basic info
-    # basic_writer = xlwriter.BasicInfoWriter()
-    # tasks=[asyncio.create_task(basic_writer.write_basic_info(soup)) for soup in SOUPS]
-    # await asyncio.gather(*tasks)
-    # basic_writer.workbook.close()
+    #collect basic info
+    basic_writer = xlwriter.BasicInfoWriter()
+    tasks=[asyncio.create_task(basic_writer.write_basic_info(soup)) for soup in SOUPS]
+    await asyncio.gather(*tasks)
+    basic_writer.workbook.close()
 
-    # #collect tale of size
-    # tale_size_writer=xlwriter.TaleOfSizeWriter()
-    # tasks=[asyncio.create_task(tale_size_writer.write_tale_of_size(soup)) for soup in SOUPS]
-    # await asyncio.gather(*tasks)
-    # tale_size_writer.workbook.close()
+    #collect tale of size
+    tale_size_writer=xlwriter.TaleOfSizeWriter()
+    tasks=[asyncio.create_task(tale_size_writer.write_tale_of_size(soup)) for soup in SOUPS]
+    await asyncio.gather(*tasks)
+    tale_size_writer.workbook.close()
 
     #collect review data
     review_writer = xlwriter.ReviewDataWriter()
