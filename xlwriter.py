@@ -137,8 +137,8 @@ class ReviewDataWriter(ExcelWriter):
         scraper = review_scraper.Review(soup)
         code = await scraper.get_code()
         worksheet.write(self.row, 0, code)
+        
         try:
-            
 
             all_review_data = await scraper.get_all_user_review_data()
 
@@ -172,3 +172,4 @@ class ReviewDataWriter(ExcelWriter):
             self.row += 1
         except:
             worksheet.write(self.row, 1, "Not Found")
+            self.row += 1
