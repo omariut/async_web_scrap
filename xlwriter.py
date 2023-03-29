@@ -45,21 +45,23 @@ class BasicInfoWriter(ExcelWriter):
 
 
     async def write_basic_info(self,soup):
-        
-        await self.get_basic_info(soup)
-        worksheet = self.worksheet
-        worksheet.write(self.row,1,self.code)
-        worksheet.write(self.row,2,self.name)
-        worksheet.write(self.row,3,self.category)
-        worksheet.write(self.row,4,self.image_url)
-        worksheet.write(self.row,5,self.kws)
-        worksheet.write(self.row,6,self.price)
-        worksheet.write(self.row,7,self.sizes)
-        worksheet.write(self.row,8,self.cord_product)
-        worksheet.write(self.row,9,self.cord_product_price)
-        worksheet.write(self.row,10,self.descraperion_title)
-        worksheet.write(self.row,11,self.descraperion)
-        self.row+=1
+        try:
+            await self.get_basic_info(soup)
+            worksheet = self.worksheet
+            worksheet.write(self.row,1,self.code)
+            worksheet.write(self.row,2,self.name)
+            worksheet.write(self.row,3,self.category)
+            worksheet.write(self.row,4,self.image_url)
+            worksheet.write(self.row,5,self.kws)
+            worksheet.write(self.row,6,self.price)
+            worksheet.write(self.row,7,self.sizes)
+            worksheet.write(self.row,8,self.cord_product)
+            worksheet.write(self.row,9,self.cord_product_price)
+            worksheet.write(self.row,10,self.descraperion_title)
+            worksheet.write(self.row,11,self.descraperion)
+            self.row+=1
+        except:
+            pass
        
     
 
@@ -78,34 +80,37 @@ class TaleOfSizeWriter(ExcelWriter):
 
 
     async def write_tale_of_size(self,soup):
-        scraper = tale_of_size_scraper
-        code = await scraper.get_code(soup)
-        table,headers,rows = await scraper.get_tale_of_size(soup)
-        if not table:
-            return 
-        worksheet=self.worksheet
-        row=worksheet.row
-        col=0
-        worksheet.write(row, col,code)
-        col=1
-        for header in headers:
-            worksheet.write(row,col,header.text)
-            row+=1
-        
-        last_row=row
-        row=worksheet.row
-        col=2
-            
-        for item in rows:
-            cells = item.find_all('td','sizeChartTCell')
-            if cells:
-                for cell in cells:
-                    
-                    worksheet.write(row,col,cell.text)
-                    col+=1
-                col=2
+        try:
+            scraper = tale_of_size_scraper
+            code = await scraper.get_code(soup)
+            table,headers,rows = await scraper.get_tale_of_size(soup)
+            if not table:
+                return 
+            worksheet=self.worksheet
+            row=worksheet.row
+            col=0
+            worksheet.write(row, col,code)
+            col=1
+            for header in headers:
+                worksheet.write(row,col,header.text)
                 row+=1
-        worksheet.row=last_row+2
+            
+            last_row=row
+            row=worksheet.row
+            col=2
+                
+            for item in rows:
+                cells = item.find_all('td','sizeChartTCell')
+                if cells:
+                    for cell in cells:
+                        
+                        worksheet.write(row,col,cell.text)
+                        col+=1
+                    col=2
+                    row+=1
+            worksheet.row=last_row+2
+        except:
+            pass
 
 class ReviewDataWriter(ExcelWriter):
     def __init__(self):
@@ -128,39 +133,42 @@ class ReviewDataWriter(ExcelWriter):
     
     
     async def write_review_data(self,soup):
-        worksheet = self.worksheet
-        scraper = review_scraper.Review(soup)
-        all_review_data = await scraper.get_all_user_review_data()
-        code = await scraper.get_code()
+        try:
+            worksheet = self.worksheet
+            scraper = review_scraper.Review(soup)
+            all_review_data = await scraper.get_all_user_review_data()
+            code = await scraper.get_code()
+            
+
+
         
 
+            overall_rating,quality_rating,total_reviews,sense_of_fit_rating,comfort_rating= await scraper.get_general_review_data()
 
-    
+            worksheet.write(self.row,0, code)
+            worksheet.write(self.row,1,overall_rating)
+            worksheet.write(self.row,2,quality_rating)
+            worksheet.write(self.row,3,total_reviews)
+            worksheet.write(self.row,4,sense_of_fit_rating)
+            worksheet.write(self.row,5,comfort_rating)
+        
 
-        overall_rating,quality_rating,total_reviews,sense_of_fit_rating,comfort_rating= await scraper.get_general_review_data()
+            for data in all_review_data:
+                name=data[0]
+                rating=data[1]
+                title=data[2]
+                text=data[3]
+                recommendation=data[4]
 
-        worksheet.write(self.row,0, code)
-        worksheet.write(self.row,1,overall_rating)
-        worksheet.write(self.row,2,quality_rating)
-        worksheet.write(self.row,3,total_reviews)
-        worksheet.write(self.row,4,sense_of_fit_rating)
-        worksheet.write(self.row,5,comfort_rating)
-       
-
-        for data in all_review_data:
-            name=data[0]
-            rating=data[1]
-            title=data[2]
-            text=data[3]
-            recommendation=data[4]
-
-            worksheet.write(self.row,6,name)
-            worksheet.write(self.row,7,rating)
-            worksheet.write(self.row,8,title)
-            worksheet.write(self.row,9,text)
-            worksheet.write(self.row,10,recommendation)
+                worksheet.write(self.row,6,name)
+                worksheet.write(self.row,7,rating)
+                worksheet.write(self.row,8,title)
+                worksheet.write(self.row,9,text)
+                worksheet.write(self.row,10,recommendation)
+                self.row+=1
             self.row+=1
-        self.row+=1
+        except:
+            pass
     
 
 
