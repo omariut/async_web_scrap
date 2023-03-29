@@ -194,10 +194,18 @@ async def get_review_data(review_soup):
 async def get_all_review_soups(soup):
     return await get_html_object(soup, 'div', 'BVRRReviewDisplayStyle5', many=True) 
 
+async def get_general_review_data(soup):
+    overall_rating = await get_ratings(soup)
+    quality_rating=await get_quality_rating(soup)
+    total_reviews = await get_number_of_reviews(soup)
+    sense_of_fit_rating = await get_sense_of_fit_rating(soup)
+    comfort_rating = await get_comfort_rating(soup)
 
-async def get_all_review_data(soup):
+    return overall_rating,quality_rating,total_reviews,sense_of_fit_rating,comfort_rating
+
+
+async def get_all_user_review_data(soup):
     review_soups = await get_all_review_soups(soup)
-    print(len(review_soups))
     review_data = []
     for soup in review_soups:
         data = await get_review_data(soup)

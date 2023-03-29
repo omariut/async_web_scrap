@@ -142,19 +142,37 @@ class ReviewDataWriter(ExcelWriter):
         self.row=0
         self.col=0
         worksheet = self.worksheet
-        worksheet.write(0,1,'name')
-        worksheet.write(0,2,'rating')
-        worksheet.write(0,3,'title')
-        worksheet.write(0,4,'text')
-        worksheet.write(0,5,'recommendation')
+        worksheet.write(0,0,"code")
+        worksheet.write(0,1,"overall_rating")
+        worksheet.write(0,2,"quality_rating")
+        worksheet.write(0,3,"total_reviews")
+        worksheet.write(0,4,"sense_of_fit_rating")
+        worksheet.write(0,5,"comfort_rating")
+        worksheet.write(0,6,'name')
+        worksheet.write(0,7,'rating')
+        worksheet.write(0,8,'title')
+        worksheet.write(0,9,'text')
+        worksheet.write(0,10,'recommendation')
         self.row+=1
     
     
     async def write_review_data(self,soup):
         worksheet = self.worksheet
-        all_review_data = await scraper.get_all_review_data(soup)
+        all_review_data = await scraper.get_all_user_review_data(soup)
         code = await scraper.get_code(soup)
+        
+
+
+    
+
+        overall_rating,quality_rating,total_reviews,sense_of_fit_rating,comfort_rating= await scraper.get_general_review_data(soup)
+
         worksheet.write(self.row,0, code)
+        worksheet.write(self.row,1,overall_rating)
+        worksheet.write(self.row,2,quality_rating)
+        worksheet.write(self.row,3,total_reviews)
+        worksheet.write(self.row,4,sense_of_fit_rating)
+        worksheet.write(self.row,5,comfort_rating)
        
 
         for data in all_review_data:
@@ -164,11 +182,11 @@ class ReviewDataWriter(ExcelWriter):
             text=data[3]
             recommendation=data[4]
 
-            worksheet.write(self.row,1,name)
-            worksheet.write(self.row,2,rating)
-            worksheet.write(self.row,3,title)
-            worksheet.write(self.row,4,text)
-            worksheet.write(self.row,5,recommendation)
+            worksheet.write(self.row,6,name)
+            worksheet.write(self.row,7,rating)
+            worksheet.write(self.row,8,title)
+            worksheet.write(self.row,9,text)
+            worksheet.write(self.row,10,recommendation)
             self.row+=1
         self.row+=1
     
