@@ -1,7 +1,9 @@
 import xlsxwriter
-import  scraper
 import asyncio
-import scraper
+import product_scraper
+import review_scraper
+import tale_of_size_scraper
+
 class ExcelWriter:
     def __init__(self,file_name):
         self.workbook = xlsxwriter.Workbook(file_name)
@@ -28,37 +30,37 @@ class BasicInfoWriter(ExcelWriter):
         self.row=2
     
     async def get_basic_info(self,soup):
-        self.code =await scraper.get_code(soup)
-        self.name=await scraper.get_product_name(soup)
-        self.category=await scraper.get_category_name(soup)
-        self.image_url=await scraper.get_image_url(soup)
-        self.kws=await scraper.get_all_kws(soup)
-        self.price = await scraper.get_pricing(soup)
-        self.sizes=await scraper.get_sizes(soup)
-        self.cord_product=await scraper.get_coordinated_product_names(soup)
-        self.cord_product_price=await scraper.get_coordinated_product_prices(soup)
-        self.descraperion_title=await scraper.get_descraperion_title(soup)
-        self.descraperion=await scraper.get_general_descraperion(soup)
+        scraper = product_scraper.Product(soup)
+        self.code =await scraper.get_code()
+        self.name=await scraper.get_product_name()
+        self.category=await scraper.get_category_name()
+        self.image_url=await scraper.get_image_url()
+        self.kws=await scraper.get_all_kws()
+        self.price = await scraper.get_pricing()
+        self.sizes=await scraper.get_sizes()
+        self.cord_product=await scraper.get_coordinated_product_names()
+        self.cord_product_price=await scraper.get_coordinated_product_prices()
+        self.descraperion_title=await scraper.get_description_title()
+        self.descraperion=await scraper.get_general_description()
 
 
     async def write_basic_info(self,soup):
-        try:
-            await self.get_basic_info(soup)
-            worksheet = self.worksheet
-            worksheet.write(self.row,1,self.code)
-            worksheet.write(self.row,2,self.name)
-            worksheet.write(self.row,3,self.category)
-            worksheet.write(self.row,4,self.image_url)
-            worksheet.write(self.row,5,self.kws)
-            worksheet.write(self.row,6,self.price)
-            worksheet.write(self.row,7,self.sizes)
-            worksheet.write(self.row,8,self.cord_product)
-            worksheet.write(self.row,9,self.cord_product_price)
-            worksheet.write(self.row,10,self.descraperion_title)
-            worksheet.write(self.row,11,self.descraperion)
-            self.row+=1
-        except:
-            pass
+        
+        await self.get_basic_info(soup)
+        worksheet = self.worksheet
+        worksheet.write(self.row,1,self.code)
+        worksheet.write(self.row,2,self.name)
+        worksheet.write(self.row,3,self.category)
+        worksheet.write(self.row,4,self.image_url)
+        worksheet.write(self.row,5,self.kws)
+        worksheet.write(self.row,6,self.price)
+        worksheet.write(self.row,7,self.sizes)
+        worksheet.write(self.row,8,self.cord_product)
+        worksheet.write(self.row,9,self.cord_product_price)
+        worksheet.write(self.row,10,self.descraperion_title)
+        worksheet.write(self.row,11,self.descraperion)
+        self.row+=1
+       
     
 
 class TaleOfSizeWriter(ExcelWriter):
@@ -76,6 +78,7 @@ class TaleOfSizeWriter(ExcelWriter):
 
 
     async def write_tale_of_size(self,soup):
+        scraper = tale_of_size_scraper
         code = await scraper.get_code(soup)
         table,headers,rows = await scraper.get_tale_of_size(soup)
         if not table:
@@ -103,38 +106,6 @@ class TaleOfSizeWriter(ExcelWriter):
                 col=2
                 row+=1
         worksheet.row=last_row+2
-        
-
-
-        
-
-
-async def get_tale_of_size(soup):
-
-
-    # Write the table headers to the worksheet
-    table = soup.find('table', {'class': 'sizeChartTable'})
-    headers = table.find_all('th', {'class': 'sizeChartTHeaderCell'})
-    row=0
-    col=0
-    for header in headers:
-        worksheet.write(row,col,header.text)
-        row+=1
-    
-
-    # Write the table data to the worksheet
-    rows = soup.find_all('tr','sizeChartTRow')
-    row=0
-    col=1
-    for item in rows:
-        cells = item.find_all('td','sizeChartTCell')
-        if cells:
-            for cell in cells:
-                
-                worksheet.write(row,col,cell.text)
-                col+=1
-            col=1
-            row+=1
 
 class ReviewDataWriter(ExcelWriter):
     def __init__(self):
@@ -158,14 +129,15 @@ class ReviewDataWriter(ExcelWriter):
     
     async def write_review_data(self,soup):
         worksheet = self.worksheet
-        all_review_data = await scraper.get_all_user_review_data(soup)
-        code = await scraper.get_code(soup)
+        scraper = review_scraper.Review(soup)
+        all_review_data = await scraper.get_all_user_review_data()
+        code = await scraper.get_code()
         
 
 
     
 
-        overall_rating,quality_rating,total_reviews,sense_of_fit_rating,comfort_rating= await scraper.get_general_review_data(soup)
+        overall_rating,quality_rating,total_reviews,sense_of_fit_rating,comfort_rating= await scraper.get_general_review_data()
 
         worksheet.write(self.row,0, code)
         worksheet.write(self.row,1,overall_rating)
