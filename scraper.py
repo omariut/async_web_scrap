@@ -160,3 +160,46 @@ async def get_comfort_rating(soup):
 
 
     
+#review 
+async def get_review_rating(review_soup):
+    div = await get_html_object(review_soup, 'div','BVRRRatingNormalImage')
+    rating=div.find("img")["title"]
+    return rating
+
+async def get_review_title(review_soup):
+    span = await get_html_object(review_soup, 'span' , 'BVRRValue BVRRReviewTitle' )
+    return span.text
+
+async def get_review_text(review_soup):
+    span = await get_html_object(review_soup, 'span', 'BVRRReviewText')
+    return span.text
+
+async def get_recommendation(review_soup):
+    span=await get_html_object(review_soup, 'span', 'BVRRValue BVRRRecommended')
+    return span.text
+
+async def get_reviewer_name(review_soup):
+    span=await get_html_object(review_soup, 'span', 'BVRRNickname')
+    return span.text
+
+async def get_review_data(review_soup):
+    rating = await get_review_rating(review_soup)
+    title = await get_review_title(review_soup)
+    text = await get_review_text(review_soup)
+    recommendation = await get_recommendation(review_soup)
+    name = await get_reviewer_name(review_soup)
+    return name,rating,title,text,recommendation
+
+
+async def get_all_review_soups(soup):
+    return await get_html_object(soup, 'div', 'BVRRReviewDisplayStyle5', many=True) 
+
+
+async def get_all_review_data(soup):
+    review_soups = await get_all_review_soups(soup)
+    print(len(review_soups))
+    review_data = []
+    for soup in review_soups:
+        data = await get_review_data(soup)
+        review_data.append(data)
+    return review_data

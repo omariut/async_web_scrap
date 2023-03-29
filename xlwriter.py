@@ -1,6 +1,7 @@
 import xlsxwriter
 import  scraper
 import asyncio
+import scraper
 class ExcelWriter:
     def __init__(self,file_name):
         self.workbook = xlsxwriter.Workbook(file_name)
@@ -22,8 +23,8 @@ class BasicInfoWriter(ExcelWriter):
         worksheet.write(1,7,'sizes')
         worksheet.write(1,8,'cord_product')
         worksheet.write(1,9,'cord_product_price')
-        worksheet.write(1,10,'description_title')
-        worksheet.write(1,11,'description')
+        worksheet.write(1,10,'descraperion_title')
+        worksheet.write(1,11,'descraperion')
         self.row=2
     
     async def get_basic_info(self,soup):
@@ -36,8 +37,8 @@ class BasicInfoWriter(ExcelWriter):
         self.sizes=await scraper.get_sizes(soup)
         self.cord_product=await scraper.get_coordinated_product_names(soup)
         self.cord_product_price=await scraper.get_coordinated_product_prices(soup)
-        self.description_title=await scraper.get_description_title(soup)
-        self.description=await scraper.get_general_description(soup)
+        self.descraperion_title=await scraper.get_descraperion_title(soup)
+        self.descraperion=await scraper.get_general_descraperion(soup)
 
 
     async def write_basic_info(self,soup):
@@ -53,8 +54,8 @@ class BasicInfoWriter(ExcelWriter):
             worksheet.write(self.row,7,self.sizes)
             worksheet.write(self.row,8,self.cord_product)
             worksheet.write(self.row,9,self.cord_product_price)
-            worksheet.write(self.row,10,self.description_title)
-            worksheet.write(self.row,11,self.description)
+            worksheet.write(self.row,10,self.descraperion_title)
+            worksheet.write(self.row,11,self.descraperion)
             self.row+=1
         except:
             pass
@@ -134,3 +135,42 @@ async def get_tale_of_size(soup):
                 col+=1
             col=1
             row+=1
+
+class ReviewDataWriter(ExcelWriter):
+    def __init__(self):
+        super().__init__('review_info.xlsx')
+        self.row=0
+        self.col=0
+        worksheet = self.worksheet
+        worksheet.write(0,1,'name')
+        worksheet.write(0,2,'rating')
+        worksheet.write(0,3,'title')
+        worksheet.write(0,4,'text')
+        worksheet.write(0,5,'recommendation')
+        self.row+=1
+    
+    
+    async def write_review_data(self,soup):
+        worksheet = self.worksheet
+        all_review_data = await scraper.get_all_review_data(soup)
+        code = await scraper.get_code(soup)
+        worksheet.write(self.row,0, code)
+       
+
+        for data in all_review_data:
+            name=data[0]
+            rating=data[1]
+            title=data[2]
+            text=data[3]
+            recommendation=data[4]
+
+            worksheet.write(self.row,1,name)
+            worksheet.write(self.row,2,rating)
+            worksheet.write(self.row,3,title)
+            worksheet.write(self.row,4,text)
+            worksheet.write(self.row,5,recommendation)
+            self.row+=1
+        self.row+=1
+    
+
+
