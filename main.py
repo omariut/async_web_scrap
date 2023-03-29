@@ -18,7 +18,7 @@ async def get_driver():
 async def main():
 
     #get all product links
-    pages = [f"https://shop.adidas.jp/item/?gender=mens&category=wear&order=1&page={number}" for number in range(1,2)]
+    pages = [f"https://shop.adidas.jp/item/?gender=mens&category=wear&order=1&page={number}" for number in range(1,20)]
     tasks=[asyncio.create_task(get_product_urls_from_main_page(page)) for page in pages]
     product_links=await asyncio.gather(*tasks)
     
@@ -33,17 +33,17 @@ async def main():
     #SOUPS = [soup,soup,soup,soup]
 
 
-    #collect basic info
-    basic_writer = xlwriter.BasicInfoWriter()
-    tasks=[asyncio.create_task(basic_writer.write_basic_info(soup)) for soup in SOUPS]
-    await asyncio.gather(*tasks)
-    basic_writer.workbook.close()
+    # #collect basic info
+    # basic_writer = xlwriter.BasicInfoWriter()
+    # tasks=[asyncio.create_task(basic_writer.write_basic_info(soup)) for soup in SOUPS]
+    # await asyncio.gather(*tasks)
+    # basic_writer.workbook.close()
 
-    #collect tale of size
-    tale_size_writer=xlwriter.TaleOfSizeWriter()
-    tasks=[asyncio.create_task(tale_size_writer.write_tale_of_size(soup)) for soup in SOUPS]
-    await asyncio.gather(*tasks)
-    tale_size_writer.workbook.close()
+    # #collect tale of size
+    # tale_size_writer=xlwriter.TaleOfSizeWriter()
+    # tasks=[asyncio.create_task(tale_size_writer.write_tale_of_size(soup)) for soup in SOUPS]
+    # await asyncio.gather(*tasks)
+    # tale_size_writer.workbook.close()
 
     #collect review data
     review_writer = xlwriter.ReviewDataWriter()
