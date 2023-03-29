@@ -81,19 +81,6 @@ async def get_tale_of_size(soup):
         
 
 
-
-
-
-
-
-
-
-
-    # Close the workbook
-    workbook.close()
-    return headers
-    
-
 async def get_category_name(soup):
     span= await get_html_object(soup, 'span', 'categoryName test-categoryName')
     return span.text
