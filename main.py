@@ -3,54 +3,40 @@ from bs4 import BeautifulSoup
 import asyncio
 import time
 import aiohttp
+from scraper import *
+from selenium import webdriver
+import xlwriter
 
-r = []
+async def get_driver():
+    chrome_options = webdriver.chrome.options.Options()
+    chrome_options.add_argument('--blink-settings=imagesEnabled=false')
+    chrome_options.add_argument("--headless")
 
-async def scrape(url):
-    print('hello')
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as resp:
-            body = await resp.text()
-            soup = BeautifulSoup(body, 'html.parser')
-            product_links = soup.find_all('a','image_link')
-            for link in product_links:
-                if link["href"] not in r:
-                    r.append("https://shop.adidas.jp" + link["href"])
+## Add Options to Webdriver 
+    driver = webdriver.Chrome(options=chrome_options)
+    return driver
 
-async def get_page(number):
-    return f"https://shop.adidas.jp/item/?page={number}" 
 
-async def get_web_page(page):
-    print('hello')
-    return requests.get(page)
-
-async def get_soup(webpage):
-    return BeautifulSoup(web_page.content, 'html.parser')
-
-async def get_link(soup):
-    r=[]
-    for link in soup.find_all('a','image_link'):
-        if link["href"] not in product_links:
-            r.append("https://shop.adidas.jp" + link["href"])
-
-    
-
-async def get_links(page_number):
-    pages = await get_all_pages(page_number)
-    webpages=asyncio.gather(get_web_page(page) for page in pages)
-    soups = asyncio.gather(get_soup(webpage) for webpage in webpages)
-    links=asyncio.gather(get_link(soup) for soup in soups)
-    print(links)
 
 async def main():
-    pages = [f"https://shop.adidas.jp/item/?page={number}" for number in range(1,11)]
-    tasks=[asyncio.create_task(scrape(page)) for page in pages]
+    pages = [f"https://shop.adidas.jp/item/?gender=mens&category=wear&order=1&page={number}" for number in range(1,10)]
+    tasks=[asyncio.create_task(get_product_urls_from_main_page(page)) for page in pages]
+    product_links=await asyncio.gather(*tasks)
+    driver = await get_driver()
+    tasks=[asyncio.create_task(get_full_product_page(driver,link)) for product_link in product_links for link in product_link ]
+    SOUPS=await asyncio.gather(*tasks)
+    writer = xlwriter.BasicInfoWriter()
+    tasks=[asyncio.create_task(writer.write_basic_info(soup)) for soup in SOUPS]
     await asyncio.gather(*tasks)
 
 
+
+
 t1=time.time()
-asyncio.run(main())
-print(r)
+r=asyncio.run(main())
+print(product_links)
+print(ALL_PRODUCT_NAME)
+
 t2=time.time()
 print(t2-t1)
     

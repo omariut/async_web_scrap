@@ -10,7 +10,7 @@ def get_web_page(url):
 
 
 def get_links(page_number):
-    start_url = f"https://shop.adidas.jp/item/?page={page_number}"
+    start_url = f"https://shop.adidas.jp/men/?page={page_number}"
     web_page= get_web_page(start_url)
     
     soup = BeautifulSoup(web_page.content, 'html.parser')
